@@ -1,4 +1,10 @@
 void main() {
+  // Tipos de dados
+  int num = 42;
+  double decimal = 3.14;
+  String text = "Hello, World!";
+  bool isTrue = true;
+
   // Estrutura Condicional (IF)
   int x = 10;
   if (x > 5) {
@@ -35,4 +41,17 @@ void main() {
     print("Contador: $k");
     k++;
   } while (k < 2);
+
+  List<String> list = ['item 1', 'item 2', 'item 3'];
+
+  // for-each
+  for (String item in list) {
+    print(item);
+  }
+
+  // for-in
+  for (var item in list.map((i) => i.toUpperCase())) {
+    print(item);
+  }
+
 }
