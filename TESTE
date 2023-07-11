@@ -6,7 +6,7 @@ import 'package:to_do/models/item.dart';
 void main() => runApp(const App());
 
 class App extends StatelessWidget {
-  const App({super.key});
+  const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,29 +16,34 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.cyan,
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  late List<Item> items;
-
-  HomePage({Key? key}) : super(key: key) {
-    items = [];
-  }
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  var newTaskCtrl = TextEditingController();
+  late List<Item> items;
+  late TextEditingController newTaskCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    items = [];
+    newTaskCtrl = TextEditingController();
+    load();
+  }
 
   void add() {
     if (newTaskCtrl.text.isEmpty) return;
     setState(() {
-      widget.items.add(Item(title: newTaskCtrl.text, done: false));
+      items.add(Item(title: newTaskCtrl.text, done: false));
       newTaskCtrl.text = "";
       save();
     });
@@ -46,31 +51,27 @@ class _HomePageState extends State<HomePage> {
 
   void remove(int index) {
     setState(() {
-      widget.items.removeAt(index);
+      items.removeAt(index);
       save();
     });
   }
 
-  Future load() async {
+  Future<void> load() async {
     var prefs = await SharedPreferences.getInstance();
     var data = prefs.getString('data');
 
     if (data != null) {
-      Iterable decoded = jsonDecode(data);
+      Iterable<dynamic> decoded = jsonDecode(data);
       List<Item> result = decoded.map((x) => Item.fromJson(x)).toList();
       setState(() {
-        widget.items = result;
+        items = result;
       });
     }
   }
 
-  save() async {
+  Future<void> save() async {
     var prefs = await SharedPreferences.getInstance();
-    await prefs.setString('data', jsonEncode(widget.items));
-  }
-
-  _HomePageState() {
-    load();
+    await prefs.setString('data', jsonEncode(items));
   }
 
   @override
@@ -94,9 +95,9 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: ListView.builder(
-        itemCount: widget.items.length,
+        itemCount: items.length,
         itemBuilder: (BuildContext context, int index) {
-          final item = widget.items[index];
+          final item = items[index];
           return Dismissible(
             key: Key(item.title!),
             background: Container(
